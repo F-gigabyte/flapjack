@@ -194,24 +194,32 @@ StringArray parse_env_path()
 int exec_process(const StringArray* args)
 {
     StringArray paths;
-    if(args->elements[0]->msg[0] == '/')
+    bool has_slash = false;
+    for(size_t i = 0; i < args->elements[0]->len && !has_slash; i++)
+    {
+        if(args->elements[0]->msg[i] == '/')
+        {
+            has_slash = true;
+        }
+    }
+    if(has_slash)
     {
         paths = init_string_array();
+        string_array_add_string(&paths, args->elements[0]);
     }
     else
     {
         paths = parse_env_path();
-    }
-    String* slash = get_string("/", 1);
-    for(size_t i = 0; i < paths.len; i++)
-    {
-        if(paths.elements[i]->msg[paths.elements[i]->len - 1] != '/')
+        String* slash = get_string("/", 1);
+        for(size_t i = 0; i < paths.len; i++)
         {
-            paths.elements[i] = concat_str(paths.elements[i], slash);
+            if(paths.elements[i]->msg[paths.elements[i]->len - 1] != '/')
+            {
+                paths.elements[i] = concat_str(paths.elements[i], slash);
+            }
+            paths.elements[i] = concat_str(paths.elements[i], args->elements[0]);
         }
-        paths.elements[i] = concat_str(paths.elements[i], args->elements[0]);
     }
-    string_array_add_string(&paths, args->elements[0]);
     for(size_t i = 0; i < paths.len; i++)
     {
         if(access(paths.elements[i]->msg, X_OK) == 0)
