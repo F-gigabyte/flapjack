@@ -164,9 +164,25 @@ StringArray split_line(String* line)
     StringArray arg_array = init_string_array();
     size_t offset = 0;
     size_t i = 0;
+    bool in_quotes = false;
+    char start_quote = 0;
     for(; i < line->len; i++)
     {
-        if(line->msg[i] == ' ')
+        if(in_quotes)
+        {
+            if(line->msg[i] == start_quote)
+            {
+                in_quotes = false;
+                start_quote = 0;
+                if(i - offset > 0)
+                {
+                    String* arg = get_string(&line->msg[offset], i - offset);
+                    string_array_add_string(&arg_array, arg);
+                }
+                offset = i + 1;
+            }
+        }
+        else if(line->msg[i] == ' ' || line->msg[i] == '\'' || line->msg[i] == '\"')
         {
             if(i - offset > 0)
             {
@@ -174,6 +190,16 @@ StringArray split_line(String* line)
                 string_array_add_string(&arg_array, arg);
             }
             offset = i + 1;
+            if(line->msg[i] == '\'')
+            {
+                in_quotes = true;
+                start_quote = '\'';
+            }
+            else if(line->msg[i] == '\"')
+            {
+                in_quotes = true;
+                start_quote = '\"';
+            }
         }
     }
     if(i - offset > 0)
