@@ -28,6 +28,7 @@ typedef enum: char
     KEY_BACKSPACE = 5,
     KEY_DELETE = 6,
     KEY_NEWLINE = 7,
+    KEY_TAB = 8,
 } KeyValues;
 
 typedef struct
@@ -146,6 +147,10 @@ Key read_key()
     else if(c == '\n' || c == '\r')
     {
         return (Key){.special = true, .value = KEY_NEWLINE};
+    }
+    else if(c == '\t')
+    {
+        return (Key){.special = true, .value = KEY_TAB};
     }
     else if(!iscntrl(c))
     {
@@ -466,17 +471,17 @@ int exec_process(const StringArray* args)
         {
             char** arguments = get_argument_list(args);
             int status = 1;
-            pid_t p_id = fork();
+            pid_t p_id = vfork();
             if(p_id == -1)
             {
-                print_error("Unable to create new processes");
+                print_error("Unable to create new processes\r\n");
             }
             else if(p_id == 0)
             {
                 disable_raw_mode();
                 // child, call exec
-                int res = execv(paths.elements[i]->msg, arguments);
-                exit(res);
+                int res = execve(paths.elements[i]->msg, arguments, __environ);
+                _exit(res);
             }
             else
             {
