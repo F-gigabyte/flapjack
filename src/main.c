@@ -16,7 +16,6 @@
 
 struct termios orig_state;
 size_t cursor_pos;
-bool parent;
 
 typedef enum: char
 {
@@ -39,6 +38,7 @@ typedef struct
 
 StringArray last_lines;
 String* current_line;
+size_t row;
 
 void disable_raw_mode()
 {
@@ -247,6 +247,7 @@ String* get_line()
                     {
                         current_line = remove_str(current_line, cursor_pos);
                     }
+                    row = last_lines.len;
                     break;
                 }
                 case KEY_BACKSPACE:
@@ -256,6 +257,7 @@ String* get_line()
                         current_line = remove_str(current_line, cursor_pos - 1);
                         cursor_pos--;
                     }
+                    row = last_lines.len;
                     break;
                 }
                 case KEY_LEFT:
@@ -274,12 +276,34 @@ String* get_line()
                     }
                     break;
                 }
+                case KEY_UP:
+                {
+                    if(row > 0 && last_lines.len > 0)
+                    {
+                        row--;
+                        current_line = last_lines.elements[row];
+                        cursor_pos = current_line->len;
+                    }
+                    break;
+                }
+                case KEY_DOWN:
+                {
+                    if(last_lines.len != 0 && row < last_lines.len - 1)
+                    {
+                        row++;
+                        current_line = last_lines.elements[row];
+                        cursor_pos = current_line->len;
+                    }
+                    break;
+                }
                 case KEY_NEWLINE:
                 {
                     write(STDOUT_FILENO, "\r\n", 2);
                     String* res = current_line;
+                    string_array_add_string(&last_lines, res);
                     cursor_pos = 0;
                     current_line = get_string("", 0);
+                    row = last_lines.len;
                     return res;
                 }
                 default:
@@ -291,6 +315,7 @@ String* get_line()
         else
         {
            current_line = insert_str(current_line, next_key.value, cursor_pos);
+           row = last_lines.len;
            cursor_pos++;
         }
         write(STDOUT_FILENO, "\33[2K\r", 5);
@@ -500,8 +525,9 @@ int exec_process(const StringArray* args)
 
 int main()
 {
-    parent = true;
     init_string_pool();
+    last_lines = init_string_array();
+    row = 0;
     update_current_dir();
     String* dir_str = get_string("dir", 3);
     String* cd_str = get_string("cd", 2);
@@ -538,7 +564,6 @@ int main()
             }
         }
         dest_string_array(&args);
-        free(line);
     }
     dest_string_pool();
     return 0;
