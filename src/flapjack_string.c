@@ -177,7 +177,7 @@ void string_array_add_string(StringArray* array, String* str)
 
 void dest_string_array(StringArray* array)
 {
-    array->elements = realloc_array(array->elements, 0, sizeof(String));
+    array->elements = realloc_array(array->elements, 0, sizeof(String*));
     array->len = 0;
     array->capacity = 0;
 }
@@ -185,7 +185,7 @@ void dest_string_array(StringArray* array)
 String* concat_str(String* a, String* b)
 {
     size_t combined_len = a->len + b->len;
-    char* combined = malloc(sizeof(char) * (combined_len));
+    char* combined = malloc(sizeof(char) * (combined_len + 1));
     if(combined == NULL)
     {
         printf("Error: Out of memory\n");
@@ -193,7 +193,49 @@ String* concat_str(String* a, String* b)
     }
     memcpy(combined, a->msg, a->len * sizeof(char));
     memcpy(combined + a->len, b->msg, b->len * sizeof(char));
+    combined[combined_len] = 0;
     String* res = get_string(combined, combined_len);
     free(combined);
     return res;
 }
+
+String* insert_str(String* text, char c, size_t loc)
+{
+    size_t len = text->len + 1;
+    char* inserted = malloc(sizeof(char) * (len + 1));
+    if(inserted == NULL)
+    {
+        printf("Error: Out of memory\n");
+        exit(1);
+    }
+    loc = loc >= len ? len - 1 : loc;
+    memcpy(inserted, text->msg, loc);
+    memcpy(inserted + loc + 1, text->msg + loc, text->len - loc);
+    inserted[loc] = c;
+    inserted[len] = 0;
+    String* res = get_string(inserted, len);
+    free(inserted);
+    return res;
+}
+
+String* remove_str(String* text, size_t loc)
+{
+    if(loc >= text->len)
+    {
+        return text;
+    }
+    size_t len = text->len - 1;
+    char* removed = malloc(sizeof(char) * (len + 1));
+    if(removed == NULL)
+    {
+        printf("Error: Out of memory\n");
+        exit(1);
+    }
+    memcpy(removed, text->msg, loc);
+    memcpy(removed + loc, text->msg + loc + 1, text->len - loc - 1);
+    removed[len] = 0;
+    String* res = get_string(removed, len);
+    free(removed);
+    return res;
+}
+

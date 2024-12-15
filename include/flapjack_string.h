@@ -24,6 +24,8 @@ StringArray init_string_array();
 void string_array_add_string(StringArray* array, String* str);
 void dest_string_array(StringArray* array);
 String* concat_str(String* a, String* b);
+String* insert_str(String* text, char c, size_t loc);
+String* remove_str(String* text, size_t loc);
 
 void init_string_pool();
 

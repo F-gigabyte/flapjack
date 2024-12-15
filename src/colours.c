@@ -1,12 +1,13 @@
 #include <colours.h>
 
-#include <stdio.h>
+#include <unistd.h>
+#include <flapjack_printf.h>
 
 #define ASCII_ESC 27
 
 void print_esc_code(const char* code)
 {
-    printf("%c%s", ASCII_ESC, code);
+    flapjack_printf("%c%s", ASCII_ESC, code);
 }
 
 void set_text_colour(char colour, bool bright)
@@ -14,11 +15,11 @@ void set_text_colour(char colour, bool bright)
     print_esc_code("[");
     if(bright)
     {
-        printf("%d;1m", colour + 30);
+        flapjack_printf("%d;1m", colour + 30);
     }
     else
     {
-        printf("%dm", colour + 30);
+        flapjack_printf("%dm", colour + 30);
     }
 }
 
