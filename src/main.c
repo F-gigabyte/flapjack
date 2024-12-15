@@ -210,42 +210,6 @@ StringArray split_line(String* line)
     return arg_array;
 }
 
-size_t get_cursor_pos()
-{
-    char buf[32];
-    size_t i = 0;
-    if(write(STDOUT_FILENO, "\x1b[6n", 4) != 4)
-    {
-        print_error("Failed to get cursor position\r\n");
-        exit(1);
-    }
-    for(;i < sizeof(buf) - 1; i++)
-    {
-        if(read(STDOUT_FILENO, buf, 1) != 1)
-        {
-            break;
-        }
-        if(buf[i] == 'R')
-        {
-            break;
-        }
-    }
-    buf[i] = 0;
-    if(buf[0] != '\x1b' || buf[1] != '[')
-    {
-        print_error("Failed to get cursor position\r\n");
-        exit(1);
-    }
-    size_t rows;
-    size_t cols;
-    if(sscanf(&buf[2], "%zu;%zu", &rows, &cols) != 2)
-    {
-        print_error("Failed to get cursor position\r\n");
-        exit(1);
-    }
-    return cols;
-}
-
 /*
  *  0 h 1 e 2 l 3 l 4 o 5
  *  
@@ -549,47 +513,99 @@ int exec_process(const StringArray* args)
     return 1;
 }
 
-int main()
+void run_line(String* line)
 {
-    init_string_pool();
-    last_lines = init_string_array();
-    row = 0;
-    update_current_dir();
     String* dir_str = get_string("dir", 3);
     String* cd_str = get_string("cd", 2);
     String* exit_str = get_string("exit", 4);
     String* pwd_str = get_string("pwd", 3);
+    StringArray args = split_line(line);
+    if(args.len > 0)
+    {
+        if(args.elements[0] == dir_str)
+        {
+            dir_cmd(&args);
+        }
+        else if(args.elements[0] == cd_str)
+        {
+            cd_cmd(&args);
+        }
+        else if(args.elements[0] == exit_str)
+        {
+            exit(0);
+        }
+        else if(args.elements[0] == pwd_str)
+        {
+            pwd_cmd();
+        }
+        else
+        {
+            exec_process(&args);
+        }
+    }
+    dest_string_array(&args);
+}
+
+void run_cmdline()
+{
+    last_lines = init_string_array();
+    row = 0;
+    cursor_pos = 0;
     current_line = get_string("", 0);
-    enable_raw_mode();
     while(true)
     {
         flapjack_printf("%s >> ", current_dir->msg);
         String* line = get_line();
-        StringArray args = split_line(line);
-        if(args.len > 0)
+        run_line(line);
+    }
+}
+
+void run_file(const char* name)
+{
+    FILE* file = fopen(name, "r");
+    if(file == NULL)
+    {
+        flapjack_printf("Unable to open file %s\r\n", name);
+        exit(1);
+    }
+    String* line = get_string("", 0);
+    char next_letter = 0;
+    while(fread(&next_letter, 1, 1, file) == 1)
+    {
+        if(next_letter == '\n')
         {
-            if(args.elements[0] == dir_str)
-            {
-                dir_cmd(&args);
-            }
-            else if(args.elements[0] == cd_str)
-            {
-                cd_cmd(&args);
-            }
-            else if(args.elements[0] == exit_str)
-            {
-                exit(0);
-            }
-            else if(args.elements[0] == pwd_str)
-            {
-                pwd_cmd();
-            }
-            else
-            {
-                exec_process(&args);
-            }
+            run_line(line);
+            line = get_string("", 0);
         }
-        dest_string_array(&args);
+        else
+        {
+            line = insert_str(line, next_letter, line->len);
+        }
+    }
+    fclose(file);
+}
+
+int main(int argc, const char* argv[])
+{
+    if(argc != 1 && argc != 2)
+    {
+        print_error("Expected 1 or 2 arguments\r\n");
+        exit(1);
+    }
+    if(setenv("SHELL", argv[0], true) == -1)
+    {
+        print_error("Unable to overwrite SHELL variable\r\n");
+    }
+    init_string_pool();
+    update_current_dir();
+    enable_raw_mode();
+    if(argc == 1)
+    {
+        run_cmdline();
+    }
+    else
+    {
+        run_file(argv[1]);
     }
     dest_string_pool();
     return 0;
