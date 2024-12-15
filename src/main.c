@@ -291,6 +291,7 @@ String* get_line()
                 {
                     write(STDOUT_FILENO, "\r\n", 2);
                     String* res = current_line;
+                    mark_string_global(res);
                     string_array_add_string(&last_lines, res);
                     cursor_pos = 0;
                     current_line = get_string("", 0);
@@ -319,7 +320,14 @@ String* get_line()
 void update_current_dir()
 {
     char* dir = getcwd(NULL, 0);
+    setenv("PWD", dir, true);
+    if(current_dir != NULL)
+    {
+        setenv("OLDPWD", current_dir->msg, true);
+        mark_string_temp(current_dir);
+    }
     current_dir = get_string(dir, strlen(dir));
+    mark_string_global(current_dir);
     free(dir);
 }
 
@@ -545,6 +553,7 @@ void run_line(String* line)
         }
     }
     dest_string_array(&args);
+    clear_string_pool();
 }
 
 void run_cmdline()
@@ -553,6 +562,7 @@ void run_cmdline()
     row = 0;
     cursor_pos = 0;
     current_line = get_string("", 0);
+    mark_string_global(current_line);
     while(true)
     {
         flapjack_printf("%s >> ", current_dir->msg);

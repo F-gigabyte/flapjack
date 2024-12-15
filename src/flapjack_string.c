@@ -36,6 +36,7 @@ String* take_str(const char* text, size_t len)
     res->len = len;
     res->hash_val = hash_string(text, len);
     res->tombstone = false;
+    res->temp = true;
     memcpy(res->msg, text, len * sizeof(char));
     res->msg[res->len] = 0;
     return res;
@@ -87,9 +88,8 @@ bool lookup_string(const char* text, size_t len, size_t* index)
     }
 }
 
-void resize_pool()
+void resize_pool(size_t new_cap)
 {
-    size_t new_cap = get_new_array_capacity(pool.len + 1, pool.capacity);
     size_t new_array_size = new_cap * sizeof(String*);
     String** next_array = malloc(new_array_size);
     memset(next_array, 0, new_array_size);
@@ -121,11 +121,13 @@ String* get_string(const char* text, size_t len)
 {
     if(LOAD_FACTOR * pool.capacity <= (pool.len + 1))
     {
-        resize_pool();
+        resize_pool(get_new_array_capacity(pool.len + 1, pool.capacity));
     }
     size_t index;
     if(lookup_string(text, len, &index))
     {
+        pool.elements[index]->tombstone = false; // protect string from clean up
+        pool.len++;
         return pool.elements[index];
     }
     else
@@ -139,6 +141,33 @@ String* get_string(const char* text, size_t len)
         pool.elements[index] = value;
         pool.len++;
         return value;
+    }
+}
+
+void mark_string_temp(String* str)
+{
+    str->temp = true;
+}
+
+void mark_string_global(String* str)
+{
+    str->temp = false;
+}
+
+void clear_string_pool()
+{
+    for(size_t i = 0; i < pool.capacity; i++)
+    {
+        if(pool.elements[i] != NULL && pool.elements[i]->temp && !pool.elements[i]->tombstone)
+        {
+            pool.elements[i]->tombstone = true;
+            pool.len--;
+        }
+    }
+    size_t shrink_cap = LOAD_FACTOR * pool.capacity * 0.5;
+    if(shrink_cap > (pool.len + 1) && shrink_cap >= 8)
+    {
+        resize_pool(shrink_cap);
     }
 }
 

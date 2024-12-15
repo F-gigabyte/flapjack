@@ -10,6 +10,7 @@ typedef struct
     size_t len;
     size_t hash_val;
     bool tombstone;
+    bool temp;
     char msg[];
 } String;
 
@@ -28,9 +29,11 @@ String* insert_str(String* text, char c, size_t loc);
 String* remove_str(String* text, size_t loc);
 
 void init_string_pool();
+void clear_string_pool();
 
 String* get_string(const char* text, size_t len);
-void remove_string(String* text);
+void mark_string_temp(String* str);
+void mark_string_global(String* str);
 void dest_string_pool();
 
 #endif
