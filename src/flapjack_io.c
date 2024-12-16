@@ -27,7 +27,7 @@ void disable_raw_mode()
     }
 }
 
-// https://viewsourcecode.org/snaptoken/kilo/ helped with entering raw mode
+// https://viewsourcecode.org/snaptoken/kilo/ for entering raw mode
 // and handling user input in raw mode
 void enable_raw_mode()
 {
