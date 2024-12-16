@@ -65,16 +65,6 @@ StringArray split_line(String* line)
     return arg_array;
 }
 
-/*
- *  0 h 1 e 2 l 3 l 4 o 5
- *  
- *
- *  insert a 0 -> ahello -> cursor_pos 1
- *  delete a 0 -> ello -> cursor_pos 0
- *  backspace a 1 -> ello -> cursor_pos 0
- *
- */
-
 String* current_dir;
 
 void update_current_dir()
