@@ -5,7 +5,7 @@
 
 #define ASCII_ESC 27
 
-void print_esc_code(const char* code)
+static void print_esc_code(const char* code)
 {
     flapjack_printf("%c%s", ASCII_ESC, code);
 }
