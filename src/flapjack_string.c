@@ -25,7 +25,7 @@ void dest_string_pool()
     pool = (StringArray){.len = 0, .capacity = 0, .elements = NULL};
 }
 
-String* take_str(const char* text, size_t len)
+static String* take_str(const char* text, size_t len)
 {
     String* res = malloc(sizeof(String) + sizeof(char) * (len + 1));
     if(res == NULL)
@@ -42,7 +42,7 @@ String* take_str(const char* text, size_t len)
     return res;
 }
 
-size_t find_pool_array_insert_slot(String** array, size_t capacity, String* item)
+static size_t find_pool_array_insert_slot(String** array, size_t capacity, String* item)
 {
     for(size_t i = 0; true; i++)
     {
@@ -54,7 +54,7 @@ size_t find_pool_array_insert_slot(String** array, size_t capacity, String* item
     }
 }
 
-bool same_str(const char* a, const char* b, size_t len_a, size_t len_b)
+static bool same_str(const char* a, const char* b, size_t len_a, size_t len_b)
 {
     if(len_a != len_b)
     {
@@ -70,7 +70,7 @@ bool same_str(const char* a, const char* b, size_t len_a, size_t len_b)
     return true;
 }
 
-bool lookup_string(const char* text, size_t len, size_t* index)
+static bool lookup_string(const char* text, size_t len, size_t* index)
 {
     size_t hash_val = hash_string(text, len);
     for(size_t i = 0; true; i++)
@@ -88,7 +88,7 @@ bool lookup_string(const char* text, size_t len, size_t* index)
     }
 }
 
-void resize_pool(size_t new_cap)
+static void resize_pool(size_t new_cap)
 {
     size_t new_array_size = new_cap * sizeof(String*);
     String** next_array = malloc(new_array_size);
@@ -177,7 +177,7 @@ void dest_string(String* text)
     pool.len--;
 }
 
-void resize_array(StringArray* array, size_t len)
+static void resize_array(StringArray* array, size_t len)
 {
     size_t new_cap = get_new_array_capacity(len, array->capacity);
     array->elements = realloc_array(array->elements, new_cap, sizeof(String));
