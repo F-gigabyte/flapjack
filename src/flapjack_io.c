@@ -27,6 +27,8 @@ void disable_raw_mode()
     }
 }
 
+// https://viewsourcecode.org/snaptoken/kilo/ helped with entering raw mode
+// and handling user input in raw mode
 void enable_raw_mode()
 {
     if(tcgetattr(STDIN_FILENO, &orig_state) == -1)
@@ -229,6 +231,7 @@ String* get_line(const char* prompt)
         }
         flapjack_printf("\33[2K\r", 5);
         flapjack_printf("%s >> %s", prompt, current_line->msg);
+        // https://cloudaffle.com/series/customizing-the-prompt/moving-the-cursor/ for ansi codes for moving the cursor
         flapjack_printf("\e[1C");
         flapjack_printf("\e[%zuD", current_line->len - cursor_pos + 1);
     }
