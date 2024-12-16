@@ -142,7 +142,7 @@ String* get_line(const char* prompt)
 {
     current_line = get_string("", 0);
     cursor_pos = 0;
-    write(STDOUT_FILENO, "\33[2K\r", 5);
+    flapjack_printf("\33[2K\r", 5);
     flapjack_printf("%s >> ", prompt);
     while(true)
     {
@@ -208,7 +208,7 @@ String* get_line(const char* prompt)
                 }
                 case KEY_NEWLINE:
                 {
-                    write(STDOUT_FILENO, "\r\n", 2);
+                    flapjack_printf("\r\n", 2);
                     String* res = current_line;
                     mark_string_global(res);
                     string_array_add_string(&last_lines, res);
@@ -227,7 +227,7 @@ String* get_line(const char* prompt)
            row = last_lines.len;
            cursor_pos++;
         }
-        write(STDOUT_FILENO, "\33[2K\r", 5);
+        flapjack_printf("\33[2K\r", 5);
         flapjack_printf("%s >> %s", prompt, current_line->msg);
         flapjack_printf("\e[1C");
         flapjack_printf("\e[%zuD", current_line->len - cursor_pos + 1);

@@ -16,13 +16,8 @@ void flapjack_vprintf(const char* text, va_list args)
 {
     char* buffer = NULL;
     int len = vasprintf(&buffer, text, args); 
-    if(len == -1)
+    if(len == -1 || write(STDOUT_FILENO, buffer, (size_t)len) != len)
     {
-        write(STDOUT_FILENO, "Error allocating print buffer\r\n", 31);
-    }
-    if(write(STDOUT_FILENO, buffer, (size_t)len) != len)
-    {
-       write(STDOUT_FILENO, "Error: Unable to write to stdout\r\n", 34);
        exit(1);
     }
     free(buffer);
