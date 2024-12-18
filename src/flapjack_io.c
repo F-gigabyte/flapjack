@@ -212,7 +212,7 @@ String* get_line(const char* prompt)
                 {
                     flapjack_printf("\r\n", 2);
                     String* res = current_line;
-                    mark_string_global(res);
+                    add_string_reference(res);
                     string_array_add_string(&last_lines, res);
                     row = last_lines.len;
                     return res;

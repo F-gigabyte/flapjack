@@ -6,7 +6,7 @@ NAME = flapjack
 
 C_SRC = $(shell find $(SRC_DIR) -name *.c)
 
-C_FLAGS=-g -O2
+C_FLAGS=-g 
 
 build: $(OBJS)
 	@mkdir -p $(BIN_DIR)

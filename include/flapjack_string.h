@@ -10,7 +10,7 @@ typedef struct
     size_t len;
     size_t hash_val;
     bool tombstone;
-    bool temp;
+    size_t references;
     char msg[];
 } String;
 
@@ -32,8 +32,9 @@ void init_string_pool();
 void clear_string_pool();
 
 String* get_string(const char* text, size_t len);
-void mark_string_temp(String* str);
-void mark_string_global(String* str);
+void remove_string_reference(String* str);
+void add_string_reference(String* str);
 void dest_string_pool();
+bool strings_equal(const String* a, const String* b);
 
 #endif

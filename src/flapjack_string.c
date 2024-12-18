@@ -2,6 +2,7 @@
 #include <flapjack_mem.h>
 #include <string.h>
 #include <stdio.h>
+#include <error_print.h>
 
 #define LOAD_FACTOR 0.8
 
@@ -30,13 +31,13 @@ static String* take_str(const char* text, size_t len)
     String* res = malloc(sizeof(String) + sizeof(char) * (len + 1));
     if(res == NULL)
     {
-        printf("Error: Out of memory\n");
+        print_error("Error: Out of memory\r\n");
         exit(1);
     }
     res->len = len;
     res->hash_val = hash_string(text, len);
     res->tombstone = false;
-    res->temp = true;
+    res->references = 0;
     memcpy(res->msg, text, len * sizeof(char));
     res->msg[res->len] = 0;
     return res;
@@ -90,14 +91,8 @@ static bool lookup_string(const char* text, size_t len, size_t* index)
 
 static void resize_pool(size_t new_cap)
 {
-    size_t new_array_size = new_cap * sizeof(String*);
-    String** next_array = malloc(new_array_size);
-    memset(next_array, 0, new_array_size);
-    if(next_array == NULL)
-    {
-        printf("Error: Out of memory\n");
-        exit(1);
-    }
+    String** next_array = realloc_array(NULL, new_cap, sizeof(String*));
+    memset(next_array, 0, new_cap * sizeof(String*));
     for(size_t i = 0; i < pool.capacity; i++)
     {
         if(pool.elements[i] != NULL)
@@ -144,21 +139,21 @@ String* get_string(const char* text, size_t len)
     }
 }
 
-void mark_string_temp(String* str)
+void remove_string_reference(String* str)
 {
-    str->temp = true;
+    str->references = str->references <= 1 ? 0 : str->references - 1;
 }
 
-void mark_string_global(String* str)
+void add_string_reference(String* str)
 {
-    str->temp = false;
+    str->references++;
 }
 
 void clear_string_pool()
 {
     for(size_t i = 0; i < pool.capacity; i++)
     {
-        if(pool.elements[i] != NULL && pool.elements[i]->temp && !pool.elements[i]->tombstone)
+        if(pool.elements[i] != NULL && pool.elements[i]->references == 0 && !pool.elements[i]->tombstone)
         {
             pool.elements[i]->tombstone = true;
             pool.len--;
@@ -182,11 +177,6 @@ static void resize_array(StringArray* array, size_t len)
     size_t new_cap = get_new_array_capacity(len, array->capacity);
     array->elements = realloc_array(array->elements, new_cap, sizeof(String));
     array->capacity = new_cap;
-    if(array->elements == NULL)
-    {
-        printf("Error: Out of memory\n");
-        exit(1);
-    }
 }
 
 StringArray init_string_array()
@@ -217,7 +207,7 @@ String* concat_str(String* a, String* b)
     char* combined = malloc(sizeof(char) * (combined_len + 1));
     if(combined == NULL)
     {
-        printf("Error: Out of memory\n");
+        print_error("Error: Out of memory\n");
         exit(1);
     }
     memcpy(combined, a->msg, a->len * sizeof(char));
@@ -234,7 +224,7 @@ String* insert_str(String* text, char c, size_t loc)
     char* inserted = malloc(sizeof(char) * (len + 1));
     if(inserted == NULL)
     {
-        printf("Error: Out of memory\n");
+        print_error("Error: Out of memory\n");
         exit(1);
     }
     loc = loc >= len ? len - 1 : loc;
@@ -257,7 +247,7 @@ String* remove_str(String* text, size_t loc)
     char* removed = malloc(sizeof(char) * (len + 1));
     if(removed == NULL)
     {
-        printf("Error: Out of memory\n");
+        print_error("Error: Out of memory\n");
         exit(1);
     }
     memcpy(removed, text->msg, loc);
@@ -267,4 +257,3 @@ String* remove_str(String* text, size_t loc)
     free(removed);
     return res;
 }
-
