@@ -407,11 +407,11 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                             terminal.print("Stdio\r\n");
                             if(streams.stdin_path.length() > 0)
                             {
-                                terminal.print("\t[r] stdin: '%s'\r\n", streams.stdin_path.c_str());
+                                terminal.print("\t[r] stdin:  '%s'\r\n", streams.stdin_path.c_str());
                             }
                             else
                             {
-                                terminal.print("\t[r] stdin: default\r\n");
+                                terminal.print("\t[r] stdin:  default\r\n");
                             }
                             if(streams.stdout_path.length() > 0)
                             {
