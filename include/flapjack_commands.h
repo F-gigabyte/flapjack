@@ -10,6 +10,6 @@ std::string update_current_dir(const std::string& current_dir);
 int dir_cmd(TerminalIO& terminal, const std::string& current_dir, const std::vector<std::string>& args);
 int cd_cmd(TerminalIO& terminal, std::string& current_dir, const std::vector<std::string>& args);
 int pwd_cmd(TerminalIO& terminal, const std::string& current_dir, const std::vector<std::string>& args);
-int exec_process(TerminalIO& terminal, const std::vector<std::string>& args, const TerminalStream& streams);
+int exec_process(TerminalIO& terminal, bool background, const std::vector<std::string>& args, const TerminalStream& streams);
 
 #endif

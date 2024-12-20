@@ -194,7 +194,7 @@ static std::string get_file_path(FILE* handle)
     return res;
 }
 
-int exec_process(TerminalIO& terminal, const std::vector<std::string>& args, const TerminalStream& streams)
+int exec_process(TerminalIO& terminal, bool background, const std::vector<std::string>& args, const TerminalStream& streams)
 {
     std::vector<std::string> paths;
     bool has_slash = false;
@@ -305,7 +305,10 @@ int exec_process(TerminalIO& terminal, const std::vector<std::string>& args, con
             }
             else
             {
-                wait(&status);
+                if(!background)
+                {
+                    wait(&status);
+                }
                 terminal.enable_raw_mode();
             }
             for(size_t i = 0; i < args.size(); i++)

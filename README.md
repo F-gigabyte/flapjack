@@ -17,14 +17,14 @@ Move contents of register 2 into 1
 ## 1 "Data" :
 Load the value "Data" into register 1
 ## -
-Display contents of stdio and registers
+Display contents of child process background creation, stdio and registers
 ## "Name" <
 Declare a label called "Name"
 ## 1 >
 Jump to label referenced by register 1
 ## 1 @
 Change to directory referenced by register 1
-## 1 2 ... #
+## 1 2 ... \#
 Call program referenced by register 1 with args specified in the following registers given
 ## 1 2 ... _
 Perform dir command with arguments specified in registers given
@@ -38,4 +38,5 @@ Set stdin to what's in register 1
 Set stdout to what's in register 1
 ## }
 Toggle stdout write / append mode
-
+## ~
+Toggle background creation for child processes

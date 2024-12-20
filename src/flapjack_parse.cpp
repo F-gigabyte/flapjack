@@ -11,7 +11,7 @@ VarelseParser::VarelseParser() : streams(
             .stdout_append = false,
             .stderr_path = "",
             .stderr_append = false,
-        })
+        }), background(false)
 {
     for(std::size_t i = 0; i < registers.size(); i++)
     {
@@ -288,7 +288,7 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                             std::vector<std::string> cmd_args;
                             if(get_command_args(line, cmd_args))
                             {
-                                exec_process(terminal, cmd_args, streams);
+                                exec_process(terminal, background, cmd_args, streams);
                             }
                             else
                             {
@@ -385,6 +385,8 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                     {
                         if(line.size() == 1)
                         {
+                            terminal.set_text_colour(stdout, TerminalColour::LIGHT_PURPLE);
+                            terminal.print("Background: %s\r\n", background ? "true" : "false");
                             terminal.set_text_colour(stdout, TerminalColour::LIGHT_GREEN);
                             terminal.print("Stdio\r\n");
                             if(streams.stdin_path.length() > 0)
@@ -464,6 +466,18 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                         if(line.size() == 1)
                         {
                             streams.stdout_append = !streams.stdout_append;
+                        }
+                        else
+                        {
+                            terminal.print_error("Invalid instruction '%s'\r\n", lines[ip].c_str());
+                        }
+                        break;
+                    }
+                    case '~':
+                    {
+                        if(line.size() == 1)
+                        {
+                            background = !background;
                         }
                         else
                         {
