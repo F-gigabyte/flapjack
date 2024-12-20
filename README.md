@@ -54,3 +54,7 @@ Toggle stderr write / append mode
 Toggle background creation for child processes
 ## ?
 Display the current environment
+## 1 2 +
+Set environment variable specified in register 1 to the contents of register 2
+## 1 2 /
+Put the contents of the environment variable specified in register 1 into register 2

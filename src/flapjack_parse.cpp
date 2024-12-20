@@ -547,6 +547,45 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                         }
                         break;
                     }
+                    case '+':
+                    {
+                        size_t arg1;
+                        size_t arg2;
+                        if(line.size() == 3 && get_reg_arg(line[0], arg1) && get_reg_arg(line[1], arg2))
+                        {
+                            if(setenv(registers[arg1].c_str(), registers[arg2].c_str(), true) != 0)
+                            {
+                                terminal.print_error("Unable to set environment variable '%s'\r\n", registers[arg1].c_str());
+                            }
+                        }
+                        else
+                        {
+                            terminal.print_error("Invalid instruction '%s'\r\n", lines[ip].c_str());
+                        }
+                        break;
+                    }
+                    case '/':
+                    {
+                        size_t arg1;
+                        size_t arg2;
+                        if(line.size() == 3 && get_reg_arg(line[0], arg1) && get_reg_arg(line[1], arg2))
+                        {
+                            char* res = getenv(registers[arg1].c_str());
+                            if(res == NULL)
+                            {
+                                terminal.print_error("Unable to set environment variable '%s'\r\n", registers[arg1].c_str());
+                            }
+                            else
+                            {
+                                registers[arg2] = res;
+                            }
+                        }
+                        else
+                        {
+                            terminal.print_error("Invalid instruction '%s'\r\n", lines[ip].c_str());
+                        }
+                        break;
+                    }
                     default:
                     {
                         terminal.print_error("Unknown command '%s'\r\n", op.c_str());
