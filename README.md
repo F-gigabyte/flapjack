@@ -22,6 +22,8 @@ Display contents of child process background creation, stdio and registers
 Declare a label called "Name"
 ## 1 >
 Jump to label referenced by register 1
+## 1 2 >
+Jump to label referenced by register 1 if register 2 is not empty
 ## 1 @
 Change to directory referenced by register 1
 ## 1 2 ... \#

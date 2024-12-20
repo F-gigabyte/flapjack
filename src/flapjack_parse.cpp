@@ -259,12 +259,28 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                     case '>':
                     {
                         std::size_t arg1;
+                        std::size_t arg2;
                         if(line.size() == 2 && get_reg_arg(line[0], arg1))
                         {
                             std::string loc = registers[arg1];
                             if(labels.find(loc) != labels.end())
                             {
                                 ip = labels.at(loc) - 1; // will add 1 at end of loop
+                            }
+                            else
+                            {
+                                terminal.print_error("Invalid jump location '%s'\r\n", loc.c_str());
+                            }
+                        }
+                        else if(line.size() == 3 && get_reg_arg(line[0], arg1) && get_reg_arg(line[1], arg2))
+                        {
+                            std::string loc = registers[arg1];
+                            if(labels.find(loc) != labels.end())
+                            {
+                                if(registers[arg2].length() > 0)
+                                {
+                                    ip = labels.at(loc) - 1;    
+                                }
                             }
                             else
                             {
