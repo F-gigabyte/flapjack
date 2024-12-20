@@ -211,7 +211,7 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
             }
         }
     }
-    for(;ip < lines.size(); ip++)
+    for(;ip < lines.size() && !terminal.should_quit(); ip++)
     {
         std::vector<std::string> line = split_line(lines[ip]);
         if(line.size() > 0)

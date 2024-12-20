@@ -1,11 +1,10 @@
-#include <chrono>
 #include <flapjack_io.h>
 #include <termio.h>
 #include <vector>
 #include <cstdio>
 #include <cstdarg>
 #include <unistd.h>
-#include <thread>
+#include <cctype>
 
 enum KeyValue: char
 {
@@ -97,9 +96,11 @@ void TerminalIO::enable_raw_mode()
 {
     struct termios raw = original_state;
     raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG);
-    raw.c_iflag &= ~(ICRNL | IXON | BRKINT | INPCK | ISTRIP);
+    raw.c_iflag &= ~(BRKINT | ICRNL | IXON | INPCK | ISTRIP);
     raw.c_oflag &= ~(OPOST);
     raw.c_cflag |= (CS8);
+    raw.c_cc[VMIN] = 0;
+    raw.c_cc[VTIME] = 1;
     if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw) == -1)
     {
         std::fprintf(stderr, "Unable to enter raw mode\r\n");
@@ -107,6 +108,26 @@ void TerminalIO::enable_raw_mode()
     }
 }
 
+#define CNTRL_KEY(k) ((k) & 0x1f)
+
+bool TerminalIO::should_quit()
+{
+    char c = 0;
+    int num_read = read(STDIN_FILENO, &c, 1);
+    if(num_read == -1 && errno != EAGAIN)
+    {
+        std::fprintf(stderr, "Unable to read key input");
+        exit(1);
+    }
+    if(num_read == 1)
+    {
+        if(std::iscntrl(c) && c == CNTRL_KEY('c'))
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 Key TerminalIO::read_key()
 {
@@ -192,7 +213,7 @@ Key TerminalIO::read_key()
     {
         return (Key){.special = true, .value = KEY_TAB};
     }
-    else if(!iscntrl(c))
+    else if(!std::iscntrl(c))
     {
         return (Key){.special = false, .value = c};
     }

@@ -40,6 +40,7 @@ public:
     void disable_raw_mode();
     void set_text_colour(std::FILE* stream, TerminalColour colour);
     void reset_text_colour(std::FILE* stream);
+    bool should_quit();
 private:
     Key read_key();
     struct termios original_state;
