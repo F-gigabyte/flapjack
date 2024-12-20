@@ -34,9 +34,19 @@ Perform clear command
 Perform echo command with arguments specified in registers given
 ## 1 (
 Set stdin to what's in register 1
+## (
+Set stdin back to its default
 ## 1 ]
 Set stdout to what's in register 1
+## ]
+Set stdout back to its default
 ## }
 Toggle stdout write / append mode
+## 1 [
+Set stderr to what's in register 1
+## [
+Set stderr back to its default
+## {
+Toggle stderr write / append mode
 ## ~
 Toggle background creation for child processes

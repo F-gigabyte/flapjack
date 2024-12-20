@@ -473,6 +473,35 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                         }
                         break;
                     }
+                    case '[':
+                    {
+                        std::size_t arg1;
+                        if(line.size() == 1)
+                        {
+                            streams.stderr_path = "";
+                        }
+                        else if(line.size() == 2 && get_reg_arg(line[0], arg1))
+                        {
+                            streams.stderr_path = registers[arg1];
+                        }
+                        else
+                        {
+                            terminal.print_error("Invalid instruction '%s'\r\n", lines[ip].c_str());
+                        }
+                        break;
+                    }
+                    case '{':
+                    {
+                        if(line.size() == 1)
+                        {
+                            streams.stderr_append = !streams.stderr_append;
+                        }
+                        else
+                        {
+                            terminal.print_error("Invalid instruction '%s'\r\n", lines[ip].c_str());
+                        }
+                        break;
+                    }
                     case '~':
                     {
                         if(line.size() == 1)
