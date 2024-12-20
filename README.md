@@ -27,7 +27,8 @@ Jump to label referenced by register 1 if register 2 is not empty
 ## 1 @
 Change to directory referenced by register 1
 ## 1 2 ... \#
-Call program referenced by register 1 with args specified in the following registers given
+Call program referenced by register 1 with args specified in the following registers given  
+Return value is put into register 0
 ## 1 2 ... _
 Perform dir command with arguments specified in registers given
 ## )

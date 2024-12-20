@@ -1,5 +1,6 @@
 #include <flapjack_parse.h>
 #include <stdexcept>
+#include <string>
 #include <unordered_map>
 #include <flapjack_commands.h>
 
@@ -306,7 +307,7 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                             std::vector<std::string> cmd_args;
                             if(get_command_args(line, cmd_args))
                             {
-                                exec_process(terminal, background, cmd_args, streams);
+                                registers[0] = std::to_string(exec_process(terminal, background, cmd_args, streams));
                             }
                             else
                             {
