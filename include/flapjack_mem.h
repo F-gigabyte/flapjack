@@ -1,9 +1,20 @@
 #ifndef FLAPJACK_MEM_H
 #define FLAPJACK_MEM_H
 
-#include <stdlib.h>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
 
-void* realloc_array(void* array, size_t new_size, size_t elem_size);
-size_t get_new_array_capacity(size_t size, size_t capacity);
+template<class T>
+T* allocate_array(std::size_t len)
+{
+   T* res = new T[len];
+   if(res == NULL)
+   {
+        fprintf(stderr, "Error: Unable to allocate memory\r\n");
+        exit(-1);
+   }
+   return res;
+}
 
 #endif

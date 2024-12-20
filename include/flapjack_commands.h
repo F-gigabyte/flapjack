@@ -1,12 +1,15 @@
 #ifndef FLAPJACK_COMMANDS_H
 #define FLAPJACK_COMMANDS_H
 
-#include <flapjack_string.h>
+#include <string>
+#include <vector>
+#include <terminal_streams.h>
+#include <flapjack_io.h>
 
-void update_current_dir(String** current_dir);
-int dir_cmd(const String* current_dir, const StringArray* args);
-int cd_cmd(String** current_dir, const StringArray* args);
-int pwd_cmd(const String* current_dir, const StringArray* args);
-int exec_process(const StringArray* args, const String* stdin_path, const String* stdout_path, bool stdout_write);
+std::string update_current_dir(const std::string& current_dir);
+int dir_cmd(TerminalIO& terminal, const std::string& current_dir, const std::vector<std::string>& args);
+int cd_cmd(TerminalIO& terminal, std::string& current_dir, const std::vector<std::string>& args);
+int pwd_cmd(TerminalIO& terminal, const std::string& current_dir, const std::vector<std::string>& args);
+int exec_process(TerminalIO& terminal, const std::vector<std::string>& args, const TerminalStream& streams);
 
 #endif

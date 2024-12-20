@@ -4,13 +4,13 @@ BIN_DIR = bin
 CC = clang
 NAME = flapjack
 
-C_SRC = $(shell find $(SRC_DIR) -name *.c)
+CPP_SRC = $(shell find $(SRC_DIR) -name *.cpp)
 
-C_FLAGS=-g 
+CPP_FLAGS=-g -std=c++20 -xc++ -lstdc++
 
 build: $(OBJS)
 	@mkdir -p $(BIN_DIR)
-	$(CC) $(C_FLAGS) -I $(INCLUDE_DIR) -o $(BIN_DIR)/$(NAME) $(C_SRC)
+	$(CC) $(CPP_FLAGS) -I $(INCLUDE_DIR) -o $(BIN_DIR)/$(NAME) $(CPP_SRC)
 
 run:
 	./$(BIN_DIR)/$(NAME) 
