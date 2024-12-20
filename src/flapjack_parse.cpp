@@ -3,6 +3,8 @@
 #include <unordered_map>
 #include <flapjack_commands.h>
 
+extern char** environ;
+
 VarelseParser::VarelseParser() : streams(
         (TerminalStream)
         {
@@ -523,6 +525,21 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                         if(line.size() == 1)
                         {
                             background = !background;
+                        }
+                        else
+                        {
+                            terminal.print_error("Invalid instruction '%s'\r\n", lines[ip].c_str());
+                        }
+                        break;
+                    }
+                    case '?':
+                    {
+                        if(line.size() == 1)
+                        {
+                            for(size_t i = 0; environ[i] != 0; i++)
+                            {
+                                terminal.print("%s\r\n", environ[i]);
+                            }
                         }
                         else
                         {

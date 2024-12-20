@@ -11,7 +11,7 @@ int main(int argc, const char* argv[])
     {
         std::fprintf(stderr, "Usage: %s [file]\r\n", argv[0]);
     }
-    Terminal terminal;
+    Terminal terminal(argv[0]);
     if(argc == 1)
     {
         terminal.run_cmdline();

@@ -9,7 +9,7 @@
 class Terminal
 {
 public:
-    Terminal();
+    Terminal(const std::string& call_name);
     void run_cmdline();
     void run_file(const std::string& file_name);
 private:

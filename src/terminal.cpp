@@ -3,9 +3,13 @@
 #include <sys/stat.h>
 #include <flapjack_commands.h>
 
-Terminal::Terminal() : terminal_io(), parser()
+Terminal::Terminal(const std::string& call_name) : terminal_io(), parser()
 {
     current_dir = update_current_dir(current_dir);
+    if(setenv("SHELL", call_name.c_str(), true) != 0)
+    {
+        terminal_io.print_error("Unable to overwrite 'SHELL' environment variable\r\n");
+    }
 }
 
 void Terminal::run_cmdline()

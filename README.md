@@ -52,3 +52,5 @@ Set stderr back to its default
 Toggle stderr write / append mode
 ## ~
 Toggle background creation for child processes
+## ?
+Display the current environment
