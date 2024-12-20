@@ -17,7 +17,7 @@ Move contents of register 2 into 1
 ## 1 "Data" :
 Load the value "Data" into register 1
 ## -
-Print contents of all the registers
+Display contents of stdio and registers
 ## "Name" <
 Declare a label called "Name"
 ## 1 >

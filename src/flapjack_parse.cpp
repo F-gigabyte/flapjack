@@ -385,11 +385,39 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                     {
                         if(line.size() == 1)
                         {
+                            terminal.set_text_colour(stdout, TerminalColour::LIGHT_GREEN);
+                            terminal.print("Stdio\r\n");
+                            if(streams.stdin_path.length() > 0)
+                            {
+                                terminal.print("\t[r] stdin: '%s'\r\n", streams.stdin_path.c_str());
+                            }
+                            else
+                            {
+                                terminal.print("\t[r] stdin: default\r\n");
+                            }
+                            if(streams.stdout_path.length() > 0)
+                            {
+                                terminal.print("\t[%c] stdout: '%s'\r\n", streams.stdout_append ? 'a' : 'w', streams.stdout_path.c_str());
+                            }
+                            else
+                            {
+                                terminal.print("\t[%c] stdout: default\r\n", streams.stdout_append ? 'a' : 'w');
+                            }
+                            if(streams.stderr_path.length() > 0)
+                            {
+                                terminal.print("\t[%c] stderr: '%s'\r\n", streams.stderr_append ? 'a' : 'w', streams.stderr_path.c_str());
+                            }
+                            else
+                            {
+                                terminal.print("\t[%c] stderr: default\r\n", streams.stderr_append ? 'a' : 'w');
+                            }
+                            terminal.set_text_colour(stdout, TerminalColour::LIGHT_BLUE);
                             terminal.print("Registers\r\n");
-                            for(size_t i = 0; i < registers.size(); i++)
+                            for(std::size_t i = 0; i < registers.size(); i++)
                             {
                                 terminal.print("\t[%zu] \'%s\'\r\n", i, registers[i].c_str());
                             }
+                            terminal.reset_text_colour(stdout);
                         }
                         else
                         {
