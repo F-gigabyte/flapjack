@@ -21,6 +21,7 @@ private:
     bool get_command_args(const std::vector<std::string>& line, std::vector<std::string>& args);
     TerminalStream streams;
     std::array<std::string, NUM_REGISTERS> registers;
+    std::vector<std::string> stack;
     bool background;
 };
 #undef NUM_REGISTERS

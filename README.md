@@ -59,3 +59,9 @@ Display the current environment
 Set environment variable specified in register 1 to the contents of register 2
 ## 1 2 /
 Put the contents of the environment variable specified in register 1 into register 2
+## =
+Exit the terminal
+## 1 2 ... ^
+Push registers onto stack
+## 1 2 ... .
+Pop values of stack into registers

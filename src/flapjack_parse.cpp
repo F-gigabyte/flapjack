@@ -1,3 +1,4 @@
+#include "flapjack_io.h"
 #include <flapjack_parse.h>
 #include <stdexcept>
 #include <string>
@@ -14,7 +15,7 @@ VarelseParser::VarelseParser() : streams(
             .stdout_append = false,
             .stderr_path = "",
             .stderr_append = false,
-        }), background(false)
+        }), background(false), stack()
 {
     for(std::size_t i = 0; i < registers.size(); i++)
     {
@@ -438,6 +439,24 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                             {
                                 terminal.print("\t[%zu] \'%s\'\r\n", i, registers[i].c_str());
                             }
+                            if(stack.size() > 0) {
+                                terminal.set_text_colour(stdout, TerminalColour::LIGHT_RED);
+                                terminal.print("Stack\r\n");
+                                std::size_t power = 0;
+                                std::size_t len = stack.size() - 1;
+                                while(len > 0)
+                                {
+                                    power++;
+                                    len /= 10;
+                                }
+                                if(stack.size() == 1)
+                                {
+                                    power = 1;
+                                }
+                                for(std::size_t i = 0; i < stack.size(); i++) {
+                                    terminal.print("\t[%*zu] \'%s\'\r\n", (int)power, i, stack[i].c_str());
+                                }
+                            }
                             terminal.reset_text_colour(stdout);
                         }
                         else
@@ -584,6 +603,67 @@ void VarelseParser::parse(TerminalIO& terminal, std::string& current_dir, const 
                         else
                         {
                             terminal.print_error("Invalid instruction '%s'\r\n", lines[ip].c_str());
+                        }
+                        break;
+                    }
+                    case '^':
+                    {
+                        if(line.size() < 2)
+                        {
+                            terminal.print_error("Invalid instruction '%s'\r\n", lines[ip].c_str());
+                        }
+                        else
+                        {
+                            std::vector<std::string> values;
+                            if(get_command_args(line, values))
+                            {
+                                for(std::size_t i = 0; i < values.size(); i++)
+                                {
+                                    stack.emplace_back(values[i]);
+                                }
+                            }
+                            else
+                            {
+                                terminal.print_error("Invalid instruction '%s'\r\n", lines[ip].c_str());
+                            }
+                        }
+                        break;
+                    }
+                    case '.':
+                    {
+                        if(line.size() < 2)
+                        {
+                            terminal.print_error("Invalid instruction '%s'\r\n", lines[ip].c_str());
+                        }
+                        else
+                        {
+                            std::vector<std::size_t> reg;
+                            bool error = false;
+                            for(std::size_t i = 0; i < line.size() - 1; i++)
+                            {
+                                size_t arg;
+                                if(get_reg_arg(line[i], arg))
+                                {
+                                    reg.emplace_back(arg);
+                                }
+                                else
+                                {
+                                    error = true;
+                                    break;
+                                }
+                            }
+                            if(error || stack.size() < reg.size())
+                            {
+                                terminal.print_error("Invalid instruction '%s'\r\n", lines[ip].c_str());
+                            }
+                            else
+                            {
+                                for(std::size_t i = 0; i < reg.size(); i++)
+                                {
+                                    registers[reg[i]] = stack[stack.size() - 1];
+                                    stack.pop_back();
+                                }
+                            }
                         }
                         break;
                     }
